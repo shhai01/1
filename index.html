@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /*div{
+            width: 200px;
+            height: 50px;
+            border: 1px solid #000;
+        }*/
+    </style>
+</head>
+<body>
+    <input type="text" placeholder="input:" />
+    <button>send</button>
+    <div></div>
+    <script>
+        const TYPR_ENTER = 0
+        const TYPR_LEAVE = 1
+        const TYPR_MESSAGE = 2
+        var input=document.querySelector('input')
+        var button=document.querySelector('button')
+        var div=document.querySelector('div')
+        var ws = new WebSocket('ws://localhost:8001')
+
+        ws.addEventListener('open',function(){
+            div.innerHTML='successful'
+        })
+
+        button.addEventListener('click',function(){
+            var value=input.value
+            ws.send(value)
+            input.value=''
+        })
+
+        ws.addEventListener('message',function(e){
+            var data = JSON.parse(e.data)
+            var dv=document.createElement('div')
+            dv.innerText=data.msg + '------' + data.time
+            if(data.type == TYPR_ENTER){
+                dv.style.color = 'green'
+            }else if(data.type == TYPR_LEAVE){
+                dv.style.color = 'red'
+            }else{
+                dv.style.color = 'grey'
+            }
+            div.appendChild(dv)
+        })
+        
+        ws.addEventListener('close',function(){
+            div.innerHTML='connect close'
+        })
+    </script>
+</body>
+</html>
